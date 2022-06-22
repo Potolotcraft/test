@@ -6,21 +6,23 @@
 
   <script src="//unpkg.com/globe.gl"></script>
   <!--<script src="../../dist/globe.gl.js"></script>-->
-
-  
 </head>
 
 <body>
 <div id="globeViz"></div>
 
 <script>
-  const colorScale = d3.scaleOrdinal(['mediumblue']);
+  const colorScale = d3.scaleOrdinal(['orangered', 'mediumblue', 'darkgreen', 'yellow']);
+
+  const labelsTopOrientation = new Set(['Apollo 12', 'Luna 2', 'Luna 20', 'Luna 21', 'Luna 24', 'LCROSS Probe']); // avoid label collisions
 
   const elem = document.getElementById('globeViz');
   const moon = Globe()
-      .backgroundColor('rgba(0,0,0,0)')
-      .showGlobe(false)
-      .showAtmosphere(false)
+    .globeImageUrl('./lunar_surface.jpg')
+    .bumpImageUrl('./lunar_bumpmap.jpg')
+    .backgroundImageUrl('//unpkg.com/three-globe/example/img/night-sky.png')
+    .showGraticules(true)
+    .showAtmosphere(false) // moon has no atmosphere
     .labelText('label')
     .labelSize(1.7)
     .labelDotRadius(0.4)
@@ -34,12 +36,8 @@
     .onLabelClick(d => window.open(d.url, '_blank'))
     (elem);
 
-    fetch('//unpkg.com/world-atlas/land-110m.json').then(res => res.json())
-      .then(landTopo => {
-        world
-          .polygonsData(topojson.feature(landTopo, landTopo.objects.land).features)
-          .polygonCapMaterial(new THREE.MeshLambertMaterial({ color: 'darkred', side: THREE.DoubleSide }))
-          .polygonSideColor(() => 'rgba(0,0,0,0)');
+  fetch('./moon_landings.json').then(r => r.json()).then(landingSites => {
+    moon.labelsData(landingSites);
   });
 </script>
 </body>
